@@ -9,4 +9,13 @@ dotenv.config({
 })
 
 
-connectDB();
+// whenever the async method of dbconnection is completed(inside dbConnection.js) then it returns a promise so we will handle that response using ".then" and ".catch"
+connectDB()
+.then(() => {
+    app.listen(process.env.PORT || 8000, () => {
+        console.log(`Server is running on port: ${process.env.PORT}`);
+    })
+})
+.catch((err) => {
+    console.log("MONGODB CONNECTION FAILED")
+})
