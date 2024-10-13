@@ -1,7 +1,7 @@
 
 // below is a way to make a error handler of promise syntax:- 
 const asyncHandler = (requestHandler) => {
-    (req, res , next) => {
+    return (req, res , next) => {
         Promise.resolve(requestHandler(req, res , next))
             .catch((err) => next(err))
     }

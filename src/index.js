@@ -2,6 +2,7 @@
 import dotenv from "dotenv"
 // require('dotenv').config({path: './env'})
 import connectDB from './db/dbConnection.js'
+import {app} from './app.js'
 
 // we replaced this:-> "dev": "nodemon src/index.js" with a new dev command in 'package.json' which will help us to use "import" to import 'dotenv'
 dotenv.config({
