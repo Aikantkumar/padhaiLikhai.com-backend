@@ -59,6 +59,9 @@ const userSchema = new Schema({
         required:[true,"Password is required"],
         minLength: [8, "PASSWORD MUST CONTAIN 8 CHARACTERS"],
         select:false, //i.e when a user will login at our page then we can get all of his info except his password.
+    },
+    refreshToken:{
+        type:String
     }
 
 })

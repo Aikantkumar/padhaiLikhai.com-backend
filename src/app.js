@@ -9,7 +9,8 @@ const app = express()
 // the word "use" is used for middlewares(like cors) and configurations
 // app.use(cors()) ---> normal way of using it.but if we want to define that which frontend we want to connect then:-
 app.use(cors({
-    origin: process.env.CORS_ORIGIN
+    origin: process.env.CORS_ORIGIN,
+    credentials: true
 })) 
 // WE DEFINED CORS_ORIGIN IN env file as '*' bcz we are allowing frontend request from anywhere.
 
