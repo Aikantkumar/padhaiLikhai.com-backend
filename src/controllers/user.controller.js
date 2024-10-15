@@ -4,6 +4,7 @@ import { User } from "../models/user.model.js";
 import { uploadOnCloudinary } from "../utils/cloudinary.js";
 import { ApiResponse } from "../utils/ApiResponse.js"
 
+
 const registerUser = asyncHandler( async (req, res) => {
     // STEPS:-
     // GET USER DETAILS FROM FRONTEND
@@ -19,15 +20,15 @@ const registerUser = asyncHandler( async (req, res) => {
 
 
     // GET USER DETAILS FROM FRONTEND
-    const {userName ,firstName ,lastName ,email ,dob ,gender ,role,avatar ,password} = req.body
+    const {userName ,firstName ,lastName ,email ,dob ,gender ,role ,password} = req.body
     
-
-    if(!userName || !firstName || !lastName || !email || !password || !gender || !dob || !role || !avatar){
+    console.log(req.body);
+    if(!userName || !firstName || !lastName || !email || !password || !gender || !dob || !role ){
         throw new ApiError(400, "All fields are required")
     }
 
     // CHECK IF USER ALREADY EXISTS OR NOT USING HIS USERNAME OR EMAIL
-    const existedUser = User.findOne({
+    const existedUser = await User.findOne({
         //this "or" is used as an operator to check if anyone of them already exists then that means their exists a user with this userName or email. 
         $or: [{ userName },{ email }] 
     })
@@ -36,6 +37,7 @@ const registerUser = asyncHandler( async (req, res) => {
         throw new ApiError(409, "User with this email or username already exists")
     }
 
+    // console.log(req.files);
 
     // taking the path of avatar file from multer
     const avatarLocalPath = req.files?.avatar[0]?.path; //multer gives us access to the files. so first check that if we have access to files or not, then we want the file named avatar and then we got the path at which multer has uploaded the file on our localstorage 
@@ -45,15 +47,15 @@ const registerUser = asyncHandler( async (req, res) => {
     }
 
     // UPLOAD THE AVATAR TO CLOUDINARY:
-    const avatarimg = await uploadOnCloudinary(avatarLocalPath)
+    const avatar = await uploadOnCloudinary(avatarLocalPath)
     
     // check if the img is uploaded on cloudinary or not:
-    if(!avatarimg){
+    if(!avatar){
         throw new ApiError(400, "Avatar is required")
     }
 
     // CREATE USER OBJECT SO THAT WE CAN SEND THAT TO MONGODB
-    const user = User.create({
+    const user = await User.create({
         userName: userName.toLowerCase(),
         firstName ,
         lastName ,
@@ -61,7 +63,7 @@ const registerUser = asyncHandler( async (req, res) => {
         dob ,
         gender,
         role,
-        avatar: avatarimg.url,
+        avatar: avatar.url,
         password
     })
 
