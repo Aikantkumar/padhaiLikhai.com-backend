@@ -58,7 +58,7 @@ const userSchema = new Schema({
         type:String,
         required:[true,"Password is required"],
         minLength: [8, "PASSWORD MUST CONTAIN 8 CHARACTERS"],
-        select:false, //i.e when a user will login at our page then we can get all of his info except his password.
+        // select:false, //i.e when a user will login at our page then we can get all of his info except his password.
     },
     refreshToken:{
         type:String
@@ -74,10 +74,15 @@ userSchema.pre("save", async function(next){
         next();
     }
     this.password = await bcrypt.hash(this.password, 10); //duration "33:00" in "https://www.youtube.com/watch?v=eWnZVUXMq8k&list=PLu71SKxNbfoBGh_8p_NS-ZAh6v7HhYqHW&index=10"
+    next()
 });
 
 userSchema.methods.isPasswordCorrect = async function(password){
-    return await bcrypt.compare(password, this.password) //here password is the password just entered by the user and  this.password is the password is the original password already saved.
+    try {
+        return await bcrypt.compare(password, this.password) //here password is the password just entered by the user and  this.password is the password is the original password already saved.
+    } catch (error) {
+        throw new Error("Error comparing passwords");
+    }
 }
 
 // generating jwt:
