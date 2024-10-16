@@ -253,4 +253,104 @@ const refreshAccessToken = asyncHandler(async(req, res) => {
 })
 
 
-export { registerUser,loginUser, logoutUser, refreshAccessToken }  
+const changeCurrentPassword = asyncHandler(async(req,res) => {
+    const {oldPassword, newPassword} = req.body
+
+    // WE HAVE USED verifyJWT AS A MIDDLEWARE TO CHECK/VERIFY THE USER
+    // now we KNOW THAT IF THE USER IS VERIFIED THAT MEANS IN THE AUTH-MIDDLEWARE(verifyJWT) THE INFO OF THE 'user' IS STORED IN 'req.user',
+    // SO WE JUST NEED TO USE THAT 'req.user'.
+    const user = await User.findById(req.user?._id)
+    
+    // check the password
+    const isPasswordCorrect = await user.isPasswordCorrect(oldPassword)
+    if(!isPasswordCorrect){
+        throw new ApiError(400, "Invalid old password")
+    }
+
+    // if every thing is ok then: set the password
+    user.password = newPassword
+    await user.save({validateBeforeSave: false})
+
+    return res
+    .status(200)
+    .json( new ApiResponse(200, {}, "Password changed successfully"))
+
+
+
+})
+
+const getCurrentUser = asyncHandler(async(req,res) => {
+     // now we KNOW THAT IF THE USER IS VERIFIED THAT MEANS IN THE AUTH-MIDDLEWARE(verifyJWT) THE INFO OF THE 'user' IS STORED IN 'req.user',
+    // SO WE JUST NEED TO USE THAT 'req.user'.
+    return res
+    .status(200)
+    .json(200, req.user, "Current user fetched successfully")
+})
+
+const updateAccountDetails = asyncHandler(async(req, res) => {
+    const {firstName, lastName, email} = req.body
+    if(!(fullName || userName)){
+        throw new ApiError(400, "All fields are required")
+    }
+
+        const user = User.findByIdAndUpdate(
+             // now we KNOW THAT IF THE USER IS VERIFIED THAT MEANS IN THE AUTH-MIDDLEWARE(verifyJWT) THE INFO OF THE 'user' IS STORED IN 'req.user',
+            // SO WE JUST NEED TO USE THAT 'req.user'.
+            req.user?._id,
+            {
+                $set:{
+                    firstName :firstName,
+                    lastName: lastName,
+                    email: email
+                }
+            },
+            {new: true}
+        ).select("-password")
+
+    return res
+    .status(200)
+    .json(new ApiResponse(200, user , "Account details updated successfully"))
+
+    
+})
+
+
+const updateUserAvatar = asyncHandler(async(req, res) => {
+    // here we will use multer middleware so that we can upload files
+    // and only the loggedin person can update the image/avatar
+
+    //take the new avatar file from the user
+    const avatarLocalPath = req.file?.path
+    if(!avatarLocalPath){
+        throw new ApiError(400, "Avatar file is missing")
+    }
+
+    // upload on cloudinary:
+    const avatar = await uploadOnCloudinary(avatarLocalPath)
+
+    if(!avatar.url){
+        throw new ApiError(400, "Error while uploading avatar")
+    }
+
+// now update the avatar
+    const user = await User.findByIdAndUpdate(
+        req.user?._id,
+        {
+            $set:{
+                avatar: avatar.url
+            }
+        },
+        {new : true}
+    ).select("-password")
+
+    return res
+    .status(200)
+    .json(
+        new ApiResponse(200, user, "avatar image updated successfully")
+    )
+
+
+})
+
+
+export { registerUser,loginUser, logoutUser, refreshAccessToken,changeCurrentPassword,getCurrentUser, updateAccountDetails, updateUserAvatar}  
