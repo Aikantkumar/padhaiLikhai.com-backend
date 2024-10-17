@@ -13,3 +13,5 @@ const subscriptionSchema = new Schema({
         ref: "User" // reference is taken from the user
     }
 })
+
+export const Subscription = mongoose.model("Subscription", subscriptionSchema)

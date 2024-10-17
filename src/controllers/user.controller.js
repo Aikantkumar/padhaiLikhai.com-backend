@@ -293,7 +293,7 @@ const updateAccountDetails = asyncHandler(async(req, res) => {
         throw new ApiError(400, "All fields are required")
     }
 
-        const user = User.findByIdAndUpdate(
+        const user = await User.findByIdAndUpdate(
              // now we KNOW THAT IF THE USER IS VERIFIED THAT MEANS IN THE AUTH-MIDDLEWARE(verifyJWT) THE INFO OF THE 'user' IS STORED IN 'req.user',
             // SO WE JUST NEED TO USE THAT 'req.user'.
             req.user?._id,
@@ -352,5 +352,86 @@ const updateUserAvatar = asyncHandler(async(req, res) => {
 
 })
 
+// TO GET THE OUR INFO i.e SUBSCRIBERS COUNT AND THE CHANNELS WHICH WE HAVE SUBSCRIBED USING AGGREGATE PIPELINES (duration: 16:00 in https://www.youtube.com/watch?v=fDTf1mk-jQg&list=PLu71SKxNbfoBGh_8p_NS-ZAh6v7HhYqHW&index=20 )
+const getUserChannelProfile = asyncHandler(async(req, res) => {
+    const {userName} = req.params
 
-export { registerUser,loginUser, logoutUser, refreshAccessToken,changeCurrentPassword,getCurrentUser, updateAccountDetails, updateUserAvatar}  
+    if(!userName?.trim()){
+        throw new ApiError(400, "UserName is missing")
+    }
+
+    const channel = await User.aggregate([
+        {
+            $match:{
+                userName: userName
+            }
+        },
+        {   //1st pipeline to find the subscribers of our channel
+            // by selecting the channel we get subscribers
+            // these "foreignField" we have put have came from "subscrition.model.js"
+            $lookup:{
+                from: "subscriptions",
+                localField: "_id",
+                foreignField: "channel",
+                as: "subscribers"
+            }
+        },
+
+        {   //2nd pipeline to find whom we have subscribed to
+            // by selecting the subscribers we get whom we have subscribed to.
+            $lookup:{
+                from: "subscriptions",
+                localField: "_id",
+                foreignField: "subscriber",
+                as: "subscribedTo"
+            }
+        },
+        {
+            $addFields:{
+                subscribersCount:{
+                    $size: "$subscribers"
+                },
+                channelsSubscribedToCount:{
+                    $size: "$subscribedTo"
+                },
+                // AT THE FRONTEND WE HAVE A 'SUBSCRIBE' BUTTON SO EACH CHANNEL HAS A SUBSCRIBE BUTTON,
+                // AND IF YOU ARE SUBSCRIBED THEN, IT SHOULD SHOW YOU "SUBSCRIBED" INSTEAD OF 'SUBSCRIBE' SO WE WILL SEND A TRU/FALSE DEPENDING UPON THAT YOU(USER) IS IN THE SUBSCRIBER'S LIST/DOCUMENT OR NOT.
+                isSubscribed:{
+                    $cond:{
+                        if:{$in:[req.user?._id, "$subscribers.subscriber"]}, 
+                        then: true,
+                        else: false
+                    }
+                }
+            }
+        },
+        
+        {
+            // we will project only these things to a user, whenever he will look at his profile.
+            $project:{
+                userName: 1,
+                subscribersCount: 1,
+                channelsSubscribedToCount: 1,
+                isSubscribed:1,
+                avatar:1,
+                email:1
+                
+            }
+        }
+
+    ])
+
+    if(!channel?.length){
+        throw new ApiError(404, "Channel does not exist")
+    }
+
+    return res
+    .status(200)
+    .json(
+        new ApiResponse(200, channel[0] , "User channel fetched successfully")
+    )
+
+})
+
+
+export { registerUser,loginUser, logoutUser, refreshAccessToken,changeCurrentPassword,getCurrentUser, updateAccountDetails, updateUserAvatar,  getUserChannelProfile}  
