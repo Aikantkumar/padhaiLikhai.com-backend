@@ -9,6 +9,7 @@ const  router = Router()
 // router.route("/register").post(registerUser)
 // here we have added a middleware "upload" we will use fields in which we have arrays
 router.route("/register").post(
+    // MULTER MIDDLEWARE(UPLOAD):
     upload.fields([
         {
             name:"avatar",

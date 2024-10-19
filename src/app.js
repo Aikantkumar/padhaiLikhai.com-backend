@@ -27,10 +27,11 @@ app.use(cookieParser())
 
 // routes import:-
 import userRouter from './routes/user.routes.js'
+import teacherRouter from './routes/teacher.routes.js'
 
 // routes declaration:
 // eg: http://localhost:8000/api/v1/users/register
 app.use("/api/v1/users" , userRouter) //whenever we will get request of "/users" we will pass it to userRouter
-
+app.use("/api/v1/users" , teacherRouter)
 
 export {app}

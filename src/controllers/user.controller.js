@@ -26,8 +26,6 @@ const generateAccessAndRefreshTokens = async(userId) => {
     }
 }
 
-
-
 const registerUser = asyncHandler( async (req, res) => {
     // STEPS:-
     // GET USER DETAILS FROM FRONTEND
@@ -104,6 +102,7 @@ const registerUser = asyncHandler( async (req, res) => {
         // we have already made a structure/object of response ass 'ApiResponse' and we will send all things required in it.
         new ApiResponse(200, createdUser, "User Registered successfully")
      )
+     
 })
 
 const loginUser = asyncHandler( async (req, res) => {
@@ -422,6 +421,7 @@ const getUserChannelProfile = asyncHandler(async(req, res) => {
     ])
 
     if(!channel?.length){
+        // channel is an array so if the length of channel is zero then that means there is nothing in that channel
         throw new ApiError(404, "Channel does not exist")
     }
 
