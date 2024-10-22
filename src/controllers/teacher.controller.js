@@ -3,7 +3,9 @@ import { ApiError } from "../utils/ApiError.js";
 import { ApiResponse } from "../utils/ApiResponse.js";
 import { Profile } from "../models/teacherProfile.model.js";
 import { uploadOnCloudinary } from "../utils/cloudinary.js";
+import { Enroll } from "../models/studentEnroll.model.js"
 
+// to register the teacher to make the profile of the teacher.
 const registerTeacher = asyncHandler(async (req, res) => {
     // STEPS TO REGISTER THE TEACHER:-
     // GET DETAILS OF THE TEACHER FROM req.body
@@ -78,5 +80,15 @@ const registerTeacher = asyncHandler(async (req, res) => {
     
 
 })
+
+// function for teacher to get all enrollments (i.e the no. of students who has enrolled to the teacher)
+const getAllEnrollments = asyncHandler(async(req, res) => {
+    const enrollments = await Enroll.find()
+    
+    return res
+    .status(200)
+    .json(new ApiResponse(200, enrollments, "All Enrollments fetched successfully"))
+})
+
 
 export {registerTeacher}

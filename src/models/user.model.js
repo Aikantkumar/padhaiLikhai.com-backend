@@ -79,7 +79,7 @@ userSchema.pre("save", async function(next){
 
 userSchema.methods.isPasswordCorrect = async function(password){
     try {
-        return await bcrypt.compare(password, this.password) //here password is the password just entered by the user and  this.password is the password is the original password already saved.
+        return await bcrypt.compare(password, this.password) //here password is the password just entered by the user and  this.password is the original password already saved.
     } catch (error) {
         throw new Error("Error comparing passwords");
     }

@@ -24,15 +24,14 @@ const studentEnrollmentSchema = new Schema({
     },
     studentId:{
         // mongodb wali "._id"
-        type: mongoose.Schema.ObjectId,
+        type: mongoose.Schema.Types.ObjectId,
+        ref:"User",
         required: true
     },
     password:{
         type:String,
         required: [true, "Password is required"]
     }
-
-
 })
 
 
