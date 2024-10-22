@@ -91,4 +91,4 @@ const getAllEnrollments = asyncHandler(async(req, res) => {
 })
 
 
-export {registerTeacher}
+export {registerTeacher, getAllEnrollments}
