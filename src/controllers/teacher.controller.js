@@ -90,5 +90,7 @@ const getAllEnrollments = asyncHandler(async(req, res) => {
     .json(new ApiResponse(200, enrollments, "All Enrollments fetched successfully"))
 })
 
+//const getchannelstats = asyncHandler(async(req, res) => {})
+
 
 export {registerTeacher, getAllEnrollments}
