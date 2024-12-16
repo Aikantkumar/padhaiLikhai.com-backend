@@ -98,7 +98,7 @@ const getUserPlaylists = asyncHandler(async(req, res) => {
         // now we have all the playlists stored in the variable "playlists"
         return res
         .status(200)
-        .json(new ApiResponse(400, playlists, "All playlists fetched successfully"))
+        .json(new ApiResponse(200, playlists, "All playlists fetched successfully"))
 
     } catch (error) {
         throw new ApiError(500, "Error while fetching your playlists")

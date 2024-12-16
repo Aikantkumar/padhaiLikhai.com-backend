@@ -8,6 +8,7 @@ import { getAllNotifications } from "../controllers/notification.controller.js"
 const router = Router()
 
 router.route("/student-enroll").post(verifyJWT, studentEnroll)
+
 router.route("/submit-test").post(
     upload.fields([
         {

@@ -13,7 +13,7 @@ const studentEnroll = asyncHandler(async (req, res) => {
     }
 
     // finding the student in the database, bcz if the studnt is able to enroll and do these things, then that clearly means that,
-    // the user/studnt is already registered or loggedin and his info(including password) will definitly be saved in the database,
+    // the user/studnt is already registered or loggedin and his info(including password) will definitely be saved in the database,
     // so we will find his password in the database and will compare it with the password just givn by user/student.
     const user = User.findOne({email})
 
