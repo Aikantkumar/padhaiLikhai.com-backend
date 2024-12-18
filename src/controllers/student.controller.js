@@ -38,7 +38,7 @@ const studentEnroll = asyncHandler(async (req, res) => {
     )
 
     if(!createdStudent){
-        ApiError(500, "Something went wrong while registering the Student")
+        throw new ApiError(500, "Something went wrong while registering the Student")
     }
 
     return res

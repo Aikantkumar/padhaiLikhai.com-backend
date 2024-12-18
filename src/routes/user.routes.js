@@ -37,5 +37,8 @@ router.route("/register").post(
     router.route("/playlists/:playlistId").patch(updatePlaylist)
     router.route("/playlists/:playlistId").delete(deletePlaylist)
 
+    router.route("/schedule/test").post(scheduleTest, setscheduleTasks)
+    router.route("/schedule/class").post(scheduleTest, scheduleClass )
+    router.route("/schedule/assignment").post(scheduleTest, scheduleAssignments)
 
 export default router
