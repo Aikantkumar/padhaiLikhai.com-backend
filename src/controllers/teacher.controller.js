@@ -90,7 +90,21 @@ const getAllEnrollments = asyncHandler(async(req, res) => {
     .json(new ApiResponse(200, enrollments, "All Enrollments fetched successfully"))
 })
 
-//const getchannelstats = asyncHandler(async(req, res) => {})
+const getAllTeacherProfiles = asyncHandler(async(req, res) => {
+        try {
+            const teacherProfiles = await Profile.find()
+    
+            if (!teacherProfiles || teacherProfiles.length === 0) { 
+                throw new ApiError(400, "No teacher profiles found") ; 
+            }
+    
+         return res
+        .status(200)
+        .json(new ApiResponse(200, teacherProfiles, "All Teacher's Profiles fetched successfully"))
+        } catch (error) {
+            throw new ApiError(500, "Error while fetching the profiles"); 
+        }
+})
 
 
-export {registerTeacher, getAllEnrollments}
+export {registerTeacher, getAllEnrollments, getAllTeacherProfiles}

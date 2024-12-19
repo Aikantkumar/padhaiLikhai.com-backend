@@ -12,6 +12,10 @@ const videoSchema = new Schema({
     owner:{
         type: mongoose.Schema.Types.ObjectId,
         ref: "User"
+    },
+    class: {// teacher will have to enter the class for which the video is for, so that the student can fetch videos using the class
+       type: String,
+        required: true 
     }
 
 

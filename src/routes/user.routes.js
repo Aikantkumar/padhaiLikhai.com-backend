@@ -4,6 +4,7 @@ import { upload } from "../middlewares/multer.middleware.js";
 import { verifyJWT } from "../middlewares/auth.middleware.js";
 import {createPlaylist, addVideoToPlaylist, getUserPlaylists, removeVideoFromPlaylist,  updatePlaylist, deletePlaylist } from "../controllers/playlist.controller.js"
 
+
 const  router = Router()
 
 // this was the route before adding the middleware:-
@@ -37,8 +38,6 @@ router.route("/register").post(
     router.route("/playlists/:playlistId").patch(updatePlaylist)
     router.route("/playlists/:playlistId").delete(deletePlaylist)
 
-    router.route("/schedule/test").post(scheduleTest, setscheduleTasks)
-    router.route("/schedule/class").post(scheduleTest, scheduleClass )
-    router.route("/schedule/assignment").post(scheduleTest, scheduleAssignments)
+    
 
 export default router

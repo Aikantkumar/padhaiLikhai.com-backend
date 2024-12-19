@@ -46,14 +46,23 @@ const sendNotification = asyncHandler(async(req, res) => {
 
 // function to get all notifications:
 const getAllNotifications = asyncHandler(async(req,res) => {
-    const notifications = await Notification.find()
-    if(!notifications && notifications.length() === 0){
-         new ApiError(400, "Error while fetching notifications")
-    }
-
-    return res
-    .status(200)
-    .json(200, notifications, "All Notifications fetched successfully")
+try {
+    
+        const {userId} = req.params
+    
+        const notifications = await Notification.findById({userId})
+    
+        
+        if(!notifications && notifications.length() === 0){
+             new ApiError(400, "Error while fetching notifications")
+        }
+    
+        return res
+        .status(200)
+        .json(new ApiResponse(200, notifications, "All Notifications fetched successfully"))
+     } catch (error) {
+          throw new ApiError(500, "Error while fetching notification")
+     } 
 })
 
 export {sendNotification , getAllNotifications}

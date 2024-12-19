@@ -26,7 +26,7 @@ const scheduleTest = asyncHandler(async(req, res) => {
 
     return res
     .status(200)
-    .json(throw new ApiResponse(200, test, "Test sheduled successfully"))
+    .json(new ApiResponse(200, test, "Test sheduled successfully"))
 
 })
 
@@ -38,20 +38,20 @@ const scheduleClass = asyncHandler(async(req, res) => {
         throw new ApiError(400, "All fields are required")
     }
 
-    const class = await Class.create({
+    const clss = await Class.create({
         title,
         description,
         schedule,
         isScheduled: false
     })
 
-    if(!class){
+    if(!clss){
         throw new ApiError(400, "Something went wrong while scheduling the class")        
     }
 
     return res
     .status(200)
-    .json(throw new ApiResponse(200, class, "Class sheduled successfully"))
+    .json(new ApiResponse(200, clss, "Class sheduled successfully"))
 
 })
 
@@ -77,7 +77,7 @@ const scheduleAssignments = asyncHandler(async(req, res) => {
 
     return res
     .status(200)
-    .json(throw new ApiResponse(200, ass, "Assignments sheduled successfully"))
+    .json(new ApiResponse(200, ass, "Assignments sheduled successfully"))
 
 })
 
@@ -103,6 +103,8 @@ const setscheduleTasks = asyncHandler(async (req, res) => {
          cron.schedule(cronTime, async () => {
              console.log(`Running Test: ${test.title}`);
              
+            //  NOTE:When the scheduled time arrives, it executes the code inside the cron.schedule function.
+
              //SO THIS FUNCTION WILL ACTUALLY CONVERT THE "isScheduled" AS TRUE
              test.isScheduled = true; 
               await test.save();
@@ -122,10 +124,14 @@ const setscheduleTasks = asyncHandler(async (req, res) => {
          // NOW WE WILL CONVERT THE DATE IN 'schedule' INTO THE FORM BELOW:-
          const cronTime = `${scheduleTime.getMinutes()} ${scheduleTime.getHours()} ${scheduleTime.getDate()} ${scheduleTime.getMonth() + 1} *`; 
          
+         //  NOTE:When the scheduled time arrives, it executes the code inside the cron.schedule function.
          // THIS IS FROM WHERE THE ACTUAL CODE BEGINS:-
          cron.schedule(cronTime, async () => {
              console.log(`Running Test: ${cls.title}`); // Add code to execute the cls (e.g., send notifications, update status) 
              
+            //  code to perform specific actions when the scheduled time for a test or class is reached.
+
+
              //SO THIS FUNCTION WILL ACTUALLY CONVERT THE "isScheduled" AS TRUE
              cls.isScheduled = true; 
               await cls.save();
@@ -144,6 +150,7 @@ const setscheduleTasks = asyncHandler(async (req, res) => {
              // NOW WE WILL CONVERT THE DATE IN 'schedule' INTO THE FORM BELOW:-
              const cronTime = `${scheduleTime.getMinutes()} ${scheduleTime.getHours()} ${scheduleTime.getDate()} ${scheduleTime.getMonth() + 1} *`; 
              
+            //  //  NOTE:When the scheduled time arrives, it executes the code inside the cron.schedule function.
              // THIS IS FROM WHERE THE ACTUAL CODE BEGINS:-
              cron.schedule(cronTime, async () => {
                  console.log(`Running Test: ${ass.title}`); // Add code to execute the test (e.g., send notifications, update status) 
@@ -161,4 +168,64 @@ const setscheduleTasks = asyncHandler(async (req, res) => {
 
 })
     
-export {setscheduleTasks, scheduleTest, scheduleClass , scheduleAssignments}
+// for the students
+const seeScheduledTest = asyncHandler(async (req, res) => {
+    try {
+        const tests = await Test.find({
+            isScheduled: false
+        })
+    
+        if(!tests || tests.length === 0){
+            throw new ApiError(400, "No tests scheduled")
+        }
+    
+        return res
+        .status(200)
+        .json(new ApiResponse(200, tests, "Now you can see your scheduled Tests"))
+    } catch (error) {
+        throw new ApiError(500, "Error while loading the scheduled tests")
+    }
+
+
+}) 
+
+
+const seeScheduledClass = asyncHandler(async (req, res) => {
+    try {
+        const classes = await Class.find({
+            isScheduled: false
+        })
+    
+        if(!classes || classes.length === 0){
+            throw new ApiError(400, "No classes scheduled")
+        }
+    
+        return res
+        .status(200)
+        .json(new ApiResponse(200, classes, "Now you can see your scheduled Classes"))
+    } catch (error) {
+        throw new ApiError(500, "Error while loading the scheduled Classes")
+    }
+}) 
+
+
+const seeScheduledAss = asyncHandler(async (req, res) => {
+    try {
+        const assgnmnts = await Assignment.find({
+            isScheduled: false
+        })
+    
+        if(!assgnmnts || assgnmnts.length === 0){
+            throw new ApiError(400, "No tests scheduled")
+        }
+    
+        return res
+        .status(200)
+        .json(new ApiResponse(200, assgnmnts, "Now you can see your scheduled Assignments"))
+    } catch (error) {
+        throw new ApiError(500, "Error while loading the scheduled assignments")
+    }
+})
+
+
+export {setscheduleTasks, scheduleTest, scheduleClass , scheduleAssignments, seeScheduledTest, seeScheduledClass, seeScheduledAss}
