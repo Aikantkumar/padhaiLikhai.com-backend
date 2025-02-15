@@ -31,7 +31,13 @@ const studentEnrollmentSchema = new Schema({
     password:{
         type:String,
         required: [true, "Password is required"]
-    }
+    },
+    enrollments:[
+        {
+            type: mongoose.Schema.Types.ObjectId,
+            ref:"User"
+        }
+    ]
 })
 
 
