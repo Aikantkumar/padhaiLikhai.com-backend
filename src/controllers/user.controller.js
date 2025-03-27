@@ -39,7 +39,7 @@ const registerUser = asyncHandler(async (req, res) => {
     // RETURN RESPONSE
 
 
-
+    console.log("reached register function")
     // GET USER DETAILS FROM FRONTEND
     const { userName, firstName, lastName, email, dob, gender, password, role, field, specialisation, experience, qualifications, achievements, contact } = req.body
 
@@ -75,6 +75,7 @@ const registerUser = asyncHandler(async (req, res) => {
         throw new ApiError(400, "Avatar is required")
     }
 
+    console.log("reached half function")
     // CREATE USER OBJECT SO THAT WE CAN SEND THAT TO MONGODB
     let user;
 
@@ -127,6 +128,7 @@ const registerUser = asyncHandler(async (req, res) => {
         throw new ApiError(500, "Something went wrong while registering the user")
     }
 
+    console.log("reached full function")
     // RETURN RESPONSE
     return res.status(201).json(
         // we have already made a structure/object of response ass 'ApiResponse' and we will send all things required in it.

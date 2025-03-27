@@ -8,6 +8,7 @@ import { ApiResponse } from "../utils/ApiResponse.js";
 const createPlaylist = asyncHandler(async(req, res) => {
     try {
         const {name, description} = req.body
+        const { userId } = req.params
 
         if(!name){
             throw new ApiError(400, "Name is required");
@@ -16,7 +17,8 @@ const createPlaylist = asyncHandler(async(req, res) => {
         // store the playlist in the database 
         const playlist = await Playlist.create({
             name,
-            description
+            description,
+            user: userId
         })
 
         if(!playlist){
@@ -69,7 +71,7 @@ const addVideoToPlaylist = asyncHandler(async(req, res) => {
      )
 
    } catch (error) {
-    throw new ApiError(500, "Error while adding video to the playlist");        
+        throw new ApiError(500, "Error while adding video to the playlist");        
    }
 
 })
@@ -87,7 +89,7 @@ const getUserPlaylists = asyncHandler(async(req, res) => {
         // we are searching for the playlist using userId bcz every playlist which the user has created might contain different playlist ID,
         // but in the playlist schema we have mentioned the id of user(owner), that means in mongo-storage, each playlist will be saved with the owner's id,
         // so if we want to search all the playlists then we know all the playlists will be stored in the 'Playlist' storage with one thing in common i.e owner's id
-        const playlists = Playlist.findById({ //playlists is an array
+        const playlists = Playlist.find({ //playlists is an array
                         user: userId
                     })
     
@@ -199,7 +201,43 @@ const deletePlaylist = asyncHandler(async(req, res) => {
     }
 })
 
+const getVideosOfPlaylist = asyncHandler(async(req, res) => {
+    try {
+    
+        const {playlistId} = req.params
+    
+        if(!playlistId){
+            throw new ApiError(400, "playlist Id is required")
+        }
+    
+    //    Currently, you're only retrieving the videos array, which contains references (IDs) to the Video model. If you want to fetch the details of each video (e.g., title, description, etc.), you need to use populate. populate will replace the ObjectIDs in the videos array with their corresponding Video document data.
+        const playlist = await Playlist.findById(playlistId).populate("videos")
+
+        const allvideos = playlist.videos
+ 
+        if(!playlist){
+            // A 404 error, also known as a "page not found" error
+            throw new ApiError(404, "Playlist not found");        
+        }
+
+        if(allvideos.length === 0){
+            throw new ApiError(404, "Videos not found");        
+        }
+    
+                       
+    
+        // now we have all the playlists stored in the variable "playlists"
+        return res
+        .status(200)
+        .json(new ApiResponse(200, allvideos, "All Videos of Playlist fetched successfully"))
+
+    } catch (error) {
+        throw new ApiError(500, "Error while fetching your playlists")
+    }
+
+})
 
 
 
-export { createPlaylist, addVideoToPlaylist, getUserPlaylists, removeVideoFromPlaylist,  updatePlaylist, deletePlaylist }
+
+export { createPlaylist, addVideoToPlaylist, getUserPlaylists, removeVideoFromPlaylist,  updatePlaylist, deletePlaylist, getVideosOfPlaylist }

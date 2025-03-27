@@ -8,7 +8,7 @@ const playlistSchema = new Schema({
     },
     description:{
         type: String,
-        required: true
+        
     },
     videos:[
         // this will be array of ids of videos(ids which they got when we we stored them in mongodb)
@@ -21,7 +21,8 @@ const playlistSchema = new Schema({
     // owner of the playlist is the one who has created it
     owner:{
         type: mongoose.Schema.Types.ObjectId,
-        ref: "User"
+        ref: "User",
+        required: true,
     }
 })
 

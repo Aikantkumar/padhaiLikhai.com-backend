@@ -5,6 +5,7 @@ import { Profile } from "../models/teacherProfile.model.js";
 import { uploadOnCloudinary } from "../utils/cloudinary.js";
 import { Enroll } from "../models/studentEnroll.model.js"
 import { User } from "../models/user.model.js";
+import { useState } from "react";
 
 // to register the teacher to make the profile of the teacher.
 // const registerTeacher = asyncHandler(async (req, res) => {
@@ -84,17 +85,30 @@ import { User } from "../models/user.model.js";
 
 // function for teacher to get all enrollments (i.e the no. of students who has enrolled to the teacher)
 const getAllEnrollments = asyncHandler(async (req, res) => {
-    const enrollments = await Enroll.find()
+    try {
+        const { id } = req.params
+        const allenrollments = await Enroll.find({ teacherId: id })
 
-    return res
-        .status(200)
-        .json(new ApiResponse(200, enrollments, "All Enrollments fetched successfully"))
+        if (!allenrollments) {
+            throw new ApiError(500, "No Enrollments found")
+        }
+
+        return res
+            .status(200)
+            .json(new ApiResponse(200, allenrollments, "All Enrollments fetched successfully"))
+
+
+    } catch (error) {
+        throw new ApiError(500, "Something went wrong while fetching your enrollments")
+    }
+
+
 })
 
 const enrollStudent = asyncHandler(async (req, res) => {
     const { teacherId, studentId } = req.body
 
-    const existed = Enroll.findOne({ //update this
+    const existed = Enroll.findOne({
         enrollents: studentId
     })
 
@@ -105,9 +119,9 @@ const enrollStudent = asyncHandler(async (req, res) => {
     const newEnrollment = Enroll.findOneAndUpdate(
         // Updating the Enrollment Array: If not already enrolled, it uses $addToSet to add the studentId to the enrollments array for the specified teacherId.
         // Handling Document Creation: If no document matching the teacherId exists, the upsert option creates a new one.
-        
+
         { teacherId: teacherId },
-        { $addToSet: { enrollments: studentId }}, // Add studentId to enrollments array if it doesn't exist
+        { $addToSet: { enrollments: studentId } }, // Add studentId to enrollments array if it doesn't exist
         { new: true, upsert: true } // Create a new document if it doesn't exist( if a teacher doesnt exist then we will create a new entry of teacheriD and array of studentIds)                
     )
 
@@ -122,15 +136,56 @@ const enrollStudent = asyncHandler(async (req, res) => {
         .status(200)
         .json(new ApiResponse(200, createdEnrollment, "User Enrolled successfully"))
 })
+// '6to8')}>Class 6 to 8</div>
+{/* <div onClick={() => handleClass('9to10')}>Class 9 to 10</div>
+<div onClick={() => handleClass('11to12Sc')}>Class 11 to 12 Science</div>
+<div onClick={() => handleClass('11to12Cm')}>Class 11 to 12 Commerce</div>
+<div onClick={() => handleClass('11to12Hu */}
 
-
-const getAllTeacherProfiles6to8 = asyncHandler(async (req, res) => {
+const getAllTeacherProfiles = asyncHandler(async (req, res) => {
     try {
-        const categories = [
-            '6th-Mathematics', '6th-Science', '6th-SocialScience', '6th-Hindi', '6th-English', '6th-Sanskrit',
-            '7th-Mathematics', '7th-Science', '7th-SocialScience', '7th-Hindi', '7th-English', '7th-Sanskrit',
-            '8th-Mathematics', '8th-Science', '8th-SocialScience', '8th-Hindi', '8th-English', '8th-Sanskrit'
-        ];
+
+        const { item } = req.params
+        let categories = null
+
+        if (item === '6to8') {
+            categories = [
+                '6th-Mathematics', '6th-Science', '6th-SocialScience', '6th-Hindi', '6th-English', '6th-Sanskrit',
+                '7th-Mathematics', '7th-Science', '7th-SocialScience', '7th-Hindi', '7th-English', '7th-Sanskrit',
+                '8th-Mathematics', '8th-Science', '8th-SocialScience', '8th-Hindi', '8th-English', '8th-Sanskrit'
+            ];
+        }
+        else if (item === '9to10') {
+            categories = [
+                '9th-Mathematics', '9th-Science', '9th-SocialScience', '9th-Hindi', '9th-English', '9th-Sanskrit',
+                '10th-Mathematics', '10th-Science', '10th-SocialScience', '10th-Hindi', '10th-English', '10th-Sanskrit'
+            ];
+        }
+        else if (item === '11to12Sc') {
+            categories = [
+                '11th-Mathematics', '11th-Science', '11th-SocialScience', '11th-Hindi', '11th-English', '11th-Sanskrit',
+                '12th-Mathematics', '12th-Science', '12th-SocialScience', '12th-Hindi', '12th-English', '12th-Sanskrit',
+            ];
+        }
+        else if (item === '11to12Cm') {
+            categories = [
+                '11th-Mathematics', '11th-Science', '11th-SocialScience', '11th-Hindi', '11th-English', '11th-Sanskrit',
+                '12th-Mathematics', '12th-Science', '12th-SocialScience', '12th-Hindi', '12th-English', '12th-Sanskrit',
+            ];
+        }
+        else { //11to12Hu
+            categories = [
+                '11th-Mathematics', '11th-Science', '11th-SocialScience', '11th-Hindi', '11th-English', '11th-Sanskrit',
+                '12th-Mathematics', '12th-Science', '12th-SocialScience', '12th-Hindi', '12th-English', '12th-Sanskrit',
+            ];
+        }
+
+
+        // const categories = [
+        //     '6th-Mathematics', '6th-Science', '6th-SocialScience', '6th-Hindi', '6th-English', '6th-Sanskrit',
+        //     '7th-Mathematics', '7th-Science', '7th-SocialScience', '7th-Hindi', '7th-English', '7th-Sanskrit',
+        //     '8th-Mathematics', '8th-Science', '8th-SocialScience', '8th-Hindi', '8th-English', '8th-Sanskrit'
+        // ];
 
         // the $in operator within your MongoDB query to find any profiles where the field array includes any of the specified categories.
 
@@ -150,51 +205,51 @@ const getAllTeacherProfiles6to8 = asyncHandler(async (req, res) => {
 
 
 
-const getAllTeacherProfiles9to10 = asyncHandler(async (req, res) => {
-    try {
-        const categories = [
-            '9th-Mathematics', '9th-Science', '9th-SocialScience', '9th-Hindi', '9th-English', '9th-Sanskrit',
-            '10th-Mathematics', '10th-Science', '10th-SocialScience', '10th-Hindi', '10th-English', '10th-Sanskrit'
-        ];
+// const getAllTeacherProfiles9to10 = asyncHandler(async (req, res) => {
+//     try {
+//         const categories = [
+//             '9th-Mathematics', '9th-Science', '9th-SocialScience', '9th-Hindi', '9th-English', '9th-Sanskrit',
+//             '10th-Mathematics', '10th-Science', '10th-SocialScience', '10th-Hindi', '10th-English', '10th-Sanskrit'
+//         ];
 
-        // the $in operator within your MongoDB query to find any profiles where the field array includes any of the specified categories.
+//         // the $in operator within your MongoDB query to find any profiles where the field array includes any of the specified categories.
 
-        const teacherProfiles = await User.find({ field: { $in: categories } })
+//         const teacherProfiles = await User.find({ field: { $in: categories } })
 
-        if (!teacherProfiles || teacherProfiles.length === 0) {
-            throw new ApiError(400, "No teacher profiles found");
-        }
+//         if (!teacherProfiles || teacherProfiles.length === 0) {
+//             throw new ApiError(400, "No teacher profiles found");
+//         }
 
-        return res
-            .status(200)
-            .json(new ApiResponse(200, teacherProfiles, "All Teacher's Profiles fetched successfully"))
-    } catch (error) {
-        throw new ApiError(500, "Error while fetching the profiles");
-    }
-})
-const getAllTeacherProfiles11to12 = asyncHandler(async (req, res) => {
-    try {
-        const categories = [
-            '11th-Mathematics', '11th-Science', '11th-SocialScience', '11th-Hindi', '11th-English', '11th-Sanskrit',
-            '12th-Mathematics', '12th-Science', '12th-SocialScience', '12th-Hindi', '12th-English', '12th-Sanskrit',
+//         return res
+//             .status(200)
+//             .json(new ApiResponse(200, teacherProfiles, "All Teacher's Profiles fetched successfully"))
+//     } catch (error) {
+//         throw new ApiError(500, "Error while fetching the profiles");
+//     }
+// })
+// const getAllTeacherProfiles11to12 = asyncHandler(async (req, res) => {
+//     try {
+//         const categories = [
+//             '11th-Mathematics', '11th-Science', '11th-SocialScience', '11th-Hindi', '11th-English', '11th-Sanskrit',
+//             '12th-Mathematics', '12th-Science', '12th-SocialScience', '12th-Hindi', '12th-English', '12th-Sanskrit',
 
-        ];
+//         ];
 
-        // the $in operator within your MongoDB query to find any profiles where the field array includes any of the specified categories.
+//         // the $in operator within your MongoDB query to find any profiles where the field array includes any of the specified categories.
 
-        const teacherProfiles = await User.find({ field: { $in: categories } })
+//         const teacherProfiles = await User.find({ field: { $in: categories } })
 
-        if (!teacherProfiles || teacherProfiles.length === 0) {
-            throw new ApiError(400, "No teacher profiles found");
-        }
+//         if (!teacherProfiles || teacherProfiles.length === 0) {
+//             throw new ApiError(400, "No teacher profiles found");
+//         }
 
-        return res
-            .status(200)
-            .json(new ApiResponse(200, teacherProfiles, "All Teacher's Profiles fetched successfully"))
-    } catch (error) {
-        throw new ApiError(500, "Error while fetching the profiles");
-    }
-})
+//         return res
+//             .status(200)
+//             .json(new ApiResponse(200, teacherProfiles, "All Teacher's Profiles fetched successfully"))
+//     } catch (error) {
+//         throw new ApiError(500, "Error while fetching the profiles");
+//     }
+// })
 
 const getTeacherDetails = asyncHandler(async (req, res) => {
     try {
@@ -215,4 +270,4 @@ const getTeacherDetails = asyncHandler(async (req, res) => {
 })
 
 
-export { getAllEnrollments, getAllTeacherProfiles6to8, getAllTeacherProfiles9to10, getAllTeacherProfiles11to12, getTeacherDetails ,enrollStudent}
+export { getAllEnrollments, getAllTeacherProfiles, getTeacherDetails, enrollStudent }

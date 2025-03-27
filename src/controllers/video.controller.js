@@ -9,6 +9,7 @@ import { uploadOnCloudinary } from "../utils/cloudinary.js";
 
 const publishAVideo = asyncHandler(async(req, res) => {
     const {title, description} = req.body
+    const { userId } = req.params
 
     if(!title){
         throw new ApiError(400, "Title is required");        
@@ -24,7 +25,8 @@ const publishAVideo = asyncHandler(async(req, res) => {
     const file = Video.create({
         title,
         description,
-        file: videoFile.url
+        file: videoFile.url,
+        user: userId
     })
 
     return res
@@ -37,13 +39,13 @@ const publishAVideo = asyncHandler(async(req, res) => {
 const getAllVideos = asyncHandler(async(req, res) => {
 try {
     
-        const {userId} = req.params
+        const { userId } = req.params
     
         if(!userId){
             throw new ApiError(400, "User Id is required")
         }
     
-        const videos = Video.findById({
+        const videos = Video.find({
             user: userId
         })
     
